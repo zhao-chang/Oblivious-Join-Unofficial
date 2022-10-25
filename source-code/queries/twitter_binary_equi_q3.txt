@@ -1,0 +1,13 @@
+2
+2 3
+-1 0
+-1 2
+-1 1
+0
+
+% Query SE3: A normal user followed by a popular user.
+%
+% SELECT * FROM
+% popular-user p, normal-user n
+% WHERE p.src = n.dst;
+%

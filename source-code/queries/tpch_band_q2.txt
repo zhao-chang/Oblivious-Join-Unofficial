@@ -1,0 +1,19 @@
+2
+1 1
+-1 1
+-1 8
+-1 8
+50.00 40.00
+4
+0 1
+1 1
+0 8
+1 8
+
+% Query TB2: Parts joined with other parts with the difference of retail prices within [−50.00, 40.00].
+%
+% SELECT p1.p_partkey, p2.p_partkey, p1.p_retailprice, p2.p_retailprice
+% FROM part p1, part p2
+% WHERE p1.p_retailprice − 50.00 ≤ p2.p_retailprice
+% AND p2.p_retailprice ≤ p1.p_retailprice + 40.00;
+%

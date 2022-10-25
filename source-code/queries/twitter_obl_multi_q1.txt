@@ -1,0 +1,13 @@
+3
+3 0 2
+-1 3 3
+-1 1 2
+-1 2 1
+0
+
+% Query SM1: A popular user who is followed by a normal user followed by an inactive user.
+%
+% SELECT *
+% FROM popular-user p, normal-user n, inactive-user i
+% WHERE p.dst = n.src AND n.dst = i.src;
+%

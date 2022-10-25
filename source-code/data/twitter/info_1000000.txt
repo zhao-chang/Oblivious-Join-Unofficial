@@ -1,0 +1,304 @@
+
+------------------------------------
+Users with no less than 10000 followers:
+ID: 12, Follower Num: 1001061
+ID: 13, Follower Num: 1031830
+ID: 15, Follower Num: 14342
+ID: 20, Follower Num: 1213787
+ID: 53, Follower Num: 11206
+ID: 107, Follower Num: 10806
+ID: 291, Follower Num: 918026
+ID: 448, Follower Num: 18663
+ID: 572, Follower Num: 11791
+ID: 586, Follower Num: 920732
+ID: 633, Follower Num: 15076
+ID: 767, Follower Num: 26582
+ID: 874, Follower Num: 27196
+ID: 885, Follower Num: 11400
+ID: 888, Follower Num: 11184
+ID: 989, Follower Num: 687238
+ID: 1081, Follower Num: 22324
+ID: 1084, Follower Num: 11290
+ID: 1186, Follower Num: 18484
+ID: 1192, Follower Num: 29126
+ID: 1418, Follower Num: 14552
+ID: 1495, Follower Num: 17319
+ID: 2172, Follower Num: 44660
+ID: 2547, Follower Num: 11484
+ID: 2781, Follower Num: 14721
+ID: 3475, Follower Num: 174027
+ID: 3839, Follower Num: 23532
+ID: 3840, Follower Num: 74576
+ID: 4833, Follower Num: 16733
+ID: 5827, Follower Num: 11779
+ID: 6954, Follower Num: 31303
+ID: 7846, Follower Num: 608383
+ID: 8561, Follower Num: 11613
+ID: 9306, Follower Num: 16794
+ID: 10202, Follower Num: 89753
+ID: 10297, Follower Num: 16524
+ID: 10350, Follower Num: 1003728
+ID: 10367, Follower Num: 28950
+ID: 10396, Follower Num: 18213
+ID: 10403, Follower Num: 14307
+ID: 10419, Follower Num: 34438
+ID: 10450, Follower Num: 19145
+ID: 10867, Follower Num: 20782
+ID: 11041, Follower Num: 13987
+ID: 11426, Follower Num: 13527
+ID: 11489, Follower Num: 28078
+ID: 12522, Follower Num: 15803
+ID: 12591, Follower Num: 10945
+ID: 12759, Follower Num: 10815
+ID: 12815, Follower Num: 11370
+ID: 12916, Follower Num: 10391
+ID: 12925, Follower Num: 13502
+ID: 13046, Follower Num: 13306
+ID: 13348, Follower Num: 101959
+ID: 13479, Follower Num: 14144
+ID: 13666, Follower Num: 11211
+ID: 14763, Follower Num: 15007
+ID: 15913, Follower Num: 49117
+ID: 18713, Follower Num: 13185
+ID: 24303, Follower Num: 15510
+ID: 26743, Follower Num: 10800
+ID: 30973, Follower Num: 271215
+ID: 33423, Follower Num: 31233
+ID: 33923, Follower Num: 13804
+ID: 36823, Follower Num: 13540
+ID: 41553, Follower Num: 21689
+ID: 49793, Follower Num: 10788
+ID: 50193, Follower Num: 18753
+ID: 56623, Follower Num: 25606
+ID: 57203, Follower Num: 10652
+ID: 60273, Follower Num: 11197
+ID: 61133, Follower Num: 24651
+ID: 69153, Follower Num: 10254
+ID: 69893, Follower Num: 24599
+ID: 74673, Follower Num: 23652
+ID: 79543, Follower Num: 49081
+ID: 82243, Follower Num: 13691
+ID: 150433, Follower Num: 30832
+ID: 281563, Follower Num: 14713
+ID: 287683, Follower Num: 12141
+ID: 309073, Follower Num: 36247
+ID: 428333, Follower Num: 2450749
+ID: 457573, Follower Num: 11494
+ID: 511283, Follower Num: 11711
+ID: 608473, Follower Num: 11846
+ID: 610533, Follower Num: 16498
+ID: 610923, Follower Num: 33416
+ID: 611043, Follower Num: 10730
+ID: 611823, Follower Num: 36915
+ID: 612473, Follower Num: 24863
+ID: 616113, Follower Num: 14691
+ID: 616173, Follower Num: 71855
+ID: 618593, Follower Num: 103531
+ID: 620803, Follower Num: 12783
+ID: 621523, Follower Num: 11013
+ID: 621583, Follower Num: 27660
+ID: 621603, Follower Num: 13013
+ID: 621613, Follower Num: 15230
+ID: 624683, Follower Num: 11213
+ID: 631583, Follower Num: 30774
+ID: 639643, Follower Num: 15620
+ID: 643443, Follower Num: 40359
+ID: 646533, Follower Num: 17815
+ID: 649673, Follower Num: 27594
+ID: 651583, Follower Num: 470811
+ID: 652193, Follower Num: 10851
+ID: 655093, Follower Num: 25968
+ID: 657863, Follower Num: 1110063
+ID: 662433, Follower Num: 12370
+ID: 662763, Follower Num: 10889
+ID: 671093, Follower Num: 14592
+ID: 674433, Follower Num: 28134
+ID: 678953, Follower Num: 41172
+ID: 682903, Follower Num: 19231
+ID: 685513, Follower Num: 50306
+ID: 687063, Follower Num: 10092
+ID: 688583, Follower Num: 14104
+ID: 691353, Follower Num: 11325
+ID: 696193, Follower Num: 14548
+ID: 698663, Follower Num: 11173
+ID: 702953, Follower Num: 22304
+ID: 711303, Follower Num: 28551
+ID: 712423, Follower Num: 48464
+ID: 713143, Follower Num: 15728
+ID: 717313, Follower Num: 20145
+ID: 720843, Follower Num: 33175
+ID: 734493, Follower Num: 1059004
+ID: 734753, Follower Num: 133923
+ID: 740983, Follower Num: 29383
+ID: 742143, Follower Num: 40349
+ID: 743763, Follower Num: 53889
+ID: 746323, Follower Num: 31239
+ID: 749863, Follower Num: 44815
+ID: 749963, Follower Num: 10632
+ID: 752673, Follower Num: 17690
+ID: 754556, Follower Num: 11568
+ID: 755068, Follower Num: 28696
+ID: 755103, Follower Num: 11976
+ID: 755431, Follower Num: 17359
+ID: 755452, Follower Num: 19096
+ID: 756278, Follower Num: 75533
+ID: 758608, Follower Num: 18722
+ID: 759251, Follower Num: 170620
+ID: 761290, Follower Num: 11304
+ID: 761393, Follower Num: 37533
+ID: 767396, Follower Num: 32857
+ID: 770759, Follower Num: 79461
+ID: 772471, Follower Num: 19103
+ID: 774096, Follower Num: 51401
+ID: 774675, Follower Num: 16380
+ID: 778057, Follower Num: 11660
+ID: 780457, Follower Num: 518410
+ID: 783214, Follower Num: 1959708
+ID: 783297, Follower Num: 35029
+ID: 783705, Follower Num: 17975
+ID: 784304, Follower Num: 41566
+ID: 784492, Follower Num: 10518
+ID: 784856, Follower Num: 13879
+ID: 785032, Follower Num: 14654
+ID: 788524, Follower Num: 28146
+ID: 790201, Follower Num: 10667
+ID: 790680, Follower Num: 13384
+ID: 790826, Follower Num: 15538
+ID: 791124, Follower Num: 23278
+ID: 793830, Follower Num: 10631
+ID: 795626, Follower Num: 10560
+ID: 802074, Follower Num: 15672
+ID: 803324, Follower Num: 11775
+ID: 804204, Follower Num: 44344
+ID: 804455, Follower Num: 93645
+ID: 807095, Follower Num: 1524048
+ID: 809760, Follower Num: 23047
+ID: 811303, Follower Num: 11341
+ID: 813039, Follower Num: 10185
+ID: 813286, Follower Num: 1882889
+ID: 814253, Follower Num: 15768
+ID: 815233, Follower Num: 16269
+ID: 816214, Follower Num: 26605
+ID: 816653, Follower Num: 1041057
+ID: 817268, Follower Num: 10365
+ID: 817386, Follower Num: 14777
+ID: 817977, Follower Num: 19833
+ID: 818340, Follower Num: 12102
+ID: 819800, Follower Num: 41695
+ID: 821193, Follower Num: 20784
+ID: 839321, Follower Num: 18123
+ID: 839891, Follower Num: 10310
+ID: 852861, Follower Num: 13256
+ID: 858051, Follower Num: 16863
+ID: 862681, Follower Num: 22851
+ID: 871891, Follower Num: 12918
+ID: 898491, Follower Num: 76638
+ID: 917321, Follower Num: 15179
+ID: 920861, Follower Num: 13438
+ID: 926981, Follower Num: 13397
+ID: 930061, Follower Num: 21595
+ID: 939091, Follower Num: 28289
+ID: 972651, Follower Num: 1210996
+ID: 991221, Follower Num: 29039
+ID: 996871, Follower Num: 25780
+
+------------------------------------
+Users with no less than 10000 followings:
+ID: 874, Following Num: 26441
+ID: 1418, Following Num: 10727
+ID: 2547, Following Num: 10493
+ID: 9306, Following Num: 17762
+ID: 10202, Following Num: 88256
+ID: 10396, Following Num: 18332
+ID: 10419, Following Num: 25280
+ID: 10867, Following Num: 16622
+ID: 11426, Following Num: 13637
+ID: 12522, Following Num: 10421
+ID: 13229, Following Num: 10643
+ID: 13348, Following Num: 105289
+ID: 30973, Following Num: 138045
+ID: 56623, Following Num: 19258
+ID: 69893, Following Num: 16347
+ID: 79283, Following Num: 10788
+ID: 150433, Following Num: 29700
+ID: 281563, Following Num: 14470
+ID: 616113, Following Num: 14470
+ID: 616173, Following Num: 70437
+ID: 631583, Following Num: 20655
+ID: 651583, Following Num: 11863
+ID: 674433, Following Num: 27684
+ID: 678953, Following Num: 39599
+ID: 685513, Following Num: 35210
+ID: 696193, Following Num: 16094
+ID: 702953, Following Num: 20660
+ID: 713143, Following Num: 11036
+ID: 717313, Following Num: 14891
+ID: 720843, Following Num: 27829
+ID: 734493, Following Num: 16546
+ID: 743763, Following Num: 50930
+ID: 746323, Following Num: 27411
+ID: 755103, Following Num: 11037
+ID: 756278, Following Num: 62290
+ID: 770759, Following Num: 73426
+ID: 774675, Following Num: 11568
+ID: 784304, Following Num: 41342
+ID: 784492, Following Num: 10447
+ID: 784856, Following Num: 13949
+ID: 785032, Following Num: 15995
+ID: 785595, Following Num: 10863
+ID: 790201, Following Num: 11470
+ID: 795626, Following Num: 10603
+ID: 802074, Following Num: 15068
+ID: 803324, Following Num: 18859
+ID: 804204, Following Num: 46207
+ID: 804455, Following Num: 102827
+ID: 813286, Following Num: 770155
+ID: 815233, Following Num: 10154
+ID: 852861, Following Num: 11817
+ID: 898491, Following Num: 81649
+ID: 991221, Following Num: 12661
+
+------------------------------------
+Non-popular user information:
+# of Users with No Followers: 951817
+# of Users with No More Than 1 Followers: 3100
+# of Users with No More Than 2 Followers: 5026
+# of Users with No More Than 3 Followers: 6577
+# of Users with No More Than 4 Followers: 7866
+# of Users with No More Than 5 Followers: 8989
+# of Users with No More Than 6 Followers: 10008
+# of Users with No More Than 7 Followers: 10957
+# of Users with No More Than 8 Followers: 11789
+# of Users with No More Than 9 Followers: 12549
+# of Users with No More Than 10 Followers: 13254
+# of Users with No More Than 11 Followers: 13918
+# of Users with No More Than 12 Followers: 14515
+# of Users with No More Than 13 Followers: 15091
+# of Users with No More Than 14 Followers: 15648
+# of Users with No More Than 15 Followers: 16153
+# of Users with No More Than 16 Followers: 16678
+# of Users with No More Than 17 Followers: 17173
+# of Users with No More Than 18 Followers: 17650
+# of Users with No More Than 19 Followers: 18066
+# of Users with No More Than 20 Followers: 18491
+# of Users with No Followers and No Followings: 951085
+# of Users with No More Than 1 Followers and Followings: 2705
+# of Users with No More Than 2 Followers and Followings: 4530
+# of Users with No More Than 3 Followers and Followings: 5990
+# of Users with No More Than 4 Followers and Followings: 7260
+# of Users with No More Than 5 Followers and Followings: 8346
+# of Users with No More Than 6 Followers and Followings: 9306
+# of Users with No More Than 7 Followers and Followings: 10218
+# of Users with No More Than 8 Followers and Followings: 11030
+# of Users with No More Than 9 Followers and Followings: 11778
+# of Users with No More Than 10 Followers and Followings: 12476
+# of Users with No More Than 11 Followers and Followings: 13126
+# of Users with No More Than 12 Followers and Followings: 13704
+# of Users with No More Than 13 Followers and Followings: 14267
+# of Users with No More Than 14 Followers and Followings: 14803
+# of Users with No More Than 15 Followers and Followings: 15311
+# of Users with No More Than 16 Followers and Followings: 15823
+# of Users with No More Than 17 Followers and Followings: 16295
+# of Users with No More Than 18 Followers and Followings: 16757
+# of Users with No More Than 19 Followers and Followings: 17182
+# of Users with No More Than 20 Followers and Followings: 17580

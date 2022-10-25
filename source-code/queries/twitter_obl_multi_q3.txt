@@ -1,0 +1,14 @@
+4
+3 0 1 2
+-1 3 0 0
+-1 2 1 1
+-1 1 2 2
+0
+
+% Query SM3: An inactive user who is followed by a popular user, a normal user, and another inactive user.
+%
+% SELECT *
+% FROM popular-user p, normal-user n,
+% inactive-user i1, inactive-user i2
+% WHERE i1.dst = p.src AND i1.dst = n.src AND i1.dst = i2.src;
+%

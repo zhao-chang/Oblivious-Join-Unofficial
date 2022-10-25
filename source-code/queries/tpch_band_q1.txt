@@ -1,0 +1,19 @@
+2
+0 0
+-1 0
+-1 6
+-1 6
+100.00 1000.00
+4
+0 1
+1 1
+0 6
+1 6
+
+% Query TB1: Suppliers joined with other suppliers with the difference of account balances within [−100.00, 1000.00].
+%
+% SELECT s1.s_suppkey, s2.s_suppkey, s1.s_acctbal, s2.s_acctbal
+% FROM supplier p1, supplier p2
+% WHERE s1.s_acctbal − 100.00 ≤ s2.s_acctbal
+% AND s2.s_acctbal ≤ s1.s_acctbal + 1000.00;
+%

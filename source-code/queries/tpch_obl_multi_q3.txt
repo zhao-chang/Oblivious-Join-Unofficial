@@ -1,0 +1,21 @@
+5
+5 4 3 6 0
+-1 5 4 3 6
+-1 1 1 1 4
+-1 1 2 4 1
+5
+3 1
+4 1
+2 1
+1 1
+0 4
+
+% Query TM3: Suppliers and customers in the same nations with the purchase history of the customers.
+%
+% SELECT n_nationkey, s_suppkey, c_custkey, o_orderkey, l_linenumber
+% FROM nation, supplier, customer, orders, lineitem
+% WHERE n_nationkey = s_nationkey
+% AND s_nationkey = c_nationkey
+% AND c_custkey = o_custkey
+% AND o_orderkey = l_orderkey;
+%

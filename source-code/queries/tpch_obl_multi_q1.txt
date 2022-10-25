@@ -1,0 +1,17 @@
+3
+5 4 3
+-1 5 4
+-1 1 1
+-1 1 2
+3
+2 1
+1 1
+0 4
+
+% Query TM1: Lineitems joined with the orders they associated with and the customers who placed the orders.
+%
+% SELECT c_custkey, o_orderkey, l_linenumber
+% FROM customer, orders, lineitem
+% WHERE c_custkey = o_custkey
+% AND l_orderkey = o_orderkey;
+%

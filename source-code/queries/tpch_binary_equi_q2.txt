@@ -1,0 +1,16 @@
+2
+0 0
+-1 0
+-1 4
+-1 4
+3
+0 1
+1 1
+0 4
+
+% Query TE2: Suppliers in the same nations.
+%
+% SELECT s1.s_suppkey, s2.s_suppkey, s1.s_nationkey
+% FROM supplier s1, supplier s2
+% WHERE s1.s_nationkey = s2.s_nationkey;
+%

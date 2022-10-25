@@ -1,0 +1,16 @@
+2
+0 3
+-1 0
+-1 4
+-1 4
+3
+0 1
+1 1
+0 4
+
+% Query TE1: Suppliers and customers in the same nations.
+%
+% SELECT s_suppkey, c_custkey, s_nationkey
+% FROM supplier, customer
+% WHERE s_nationkey = c_nationkey;
+%
