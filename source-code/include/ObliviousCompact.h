@@ -192,7 +192,9 @@ private:
                     if (empty_pos >= 0) {
                         assert(empty_pos % min_skip == 0);
                         uint32_t move = empty_pos % max_skip;
-                        if (move == j) {
+                        if (move == j * min_skip) {
+                        // TODO:
+                        // if (move == j) {
                             find = true;
                             if (last) empty_pos = begin_id;
                             else empty_pos -= move;

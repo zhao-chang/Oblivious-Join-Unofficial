@@ -656,7 +656,7 @@ void generateOutputSchema(const Schema* inSchema, const uint32_t nTables, const 
 void filterOutput(ServerConnector* out_conn, uint32_t & out_tot_block, const Schema* out_sch, const CMP* out_cmp, uint32_t & access_num) {
     // initialize the buffer
     initBuffer();
-    
+
     // SIGMOD 2022: obliviously sort the output table
     // ObliviousSort* oblisort = new ObliviousSort(out_conn, out_tot_block, out_sch, out_cmp);
     // access_num = oblisort->BatcherSort();

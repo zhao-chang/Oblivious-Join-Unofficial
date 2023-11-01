@@ -4,6 +4,7 @@
 #include "Schema.h"
 #include "Util.h"
 #include "ServerConnector.h"
+#include "ObliviousHeap.h"
 #include "Basic.h"
 
 #include <algorithm>
@@ -91,7 +92,7 @@ public:
     
     uint32_t BatcherSort() {
         /*********/
-        access_num = 0;
+        comm_size = 0;
         /*********/
         uint32_t len = (uint32_t)ceil(n_block / (double)m_block);
         if (len <= 2) internal_sort(0, 2);
@@ -101,7 +102,48 @@ public:
         }
         /*********/
         printf("finish Batcher sort successfully!\n");
-        return access_num;
+        return comm_size;
+        /*********/
+    }
+    
+    uint32_t HeapSort() {
+        /*********/
+        comm_size = 0;
+        /*********/
+        ObliviousHeap* oheap = new ObliviousHeap(conn, n_block, sort_sch, sort_cmp);     
+        char* src = buffer + META_BLOCK_SIZE;
+        int32_t item_id = 0;
+        for (uint32_t i = 0; i < n_block; ++i) {
+            readBlock(conn, i, buffer);
+            char* cur = src;
+            for (uint32_t j = 0; j < sort_sch->item_per_blk; ++j) {
+                std::string content(cur, sort_sch->item_size);
+                oheap->insertItem(item_id, content);
+                ++item_id;
+                cur += sort_sch->item_size;
+            }
+        }
+        
+        for (uint32_t i = 0; i < n_block; ++i) {
+            char* cur = src;
+            uint32_t real_count = 0;
+            for (uint32_t j = 0; j < sort_sch->item_per_blk; ++j) {
+                std::string min_item = oheap->extractMin();
+                memcpy(cur, min_item.c_str(), sort_sch->item_size);
+                cur += sort_sch->item_size;
+                if (min_item[0] == 'r')
+                    ++real_count;
+            }
+            memcpy(buffer, &i, sizeof(uint32_t));
+            memcpy(&(buffer[sizeof(uint32_t)]), &real_count, sizeof(uint32_t));
+            updateBlock(conn, i, buffer);
+        }
+        comm_size += oheap->getCommSize();
+        delete oheap;
+        
+        /*********/
+        printf("finish heap sort successfully!\n");
+        return comm_size;
         /*********/
     }
     
@@ -116,7 +158,7 @@ private:
         //read block
         readBlock(conn, left, right, buffer);
         /*********/
-        access_num += right - left;
+        comm_size += (size_t)(right - left) * (size_t)B;
         /*********/
         
         //temporarily keep meta-data for each block during sorting items
@@ -199,7 +241,7 @@ private:
         // write block
         updateBlock(conn, left, right, buffer);
         /*********/
-        access_num += right - left;
+        comm_size += (size_t)(right - left) * (size_t)B;
         /*********/
     }
     
@@ -216,7 +258,7 @@ private:
         readBlock(conn, fLeft, fRight, fp);
         readBlock(conn, sLeft, sRight, sp);
         /*********/
-        access_num += (fRight - fLeft) + (sRight - sLeft);
+        comm_size += (size_t)((fRight - fLeft) + (sRight - sLeft)) * (size_t)B;
         /*********/
         
         uint32_t fLen = m_block;
@@ -390,7 +432,7 @@ private:
         updateBlock(conn, fLeft, fRight, fp);
         updateBlock(conn, sLeft, sRight, sp);
         /*********/
-        access_num += (fRight - fLeft) + (sRight - sLeft);
+        comm_size += (size_t)((fRight - fLeft) + (sRight - sLeft)) * (size_t)B;
         /*********/
     }
     
@@ -421,7 +463,7 @@ private:
     
     ServerConnector* conn;
     const uint32_t n_block;
-    uint32_t access_num;
+    size_t comm_size;
 };
 
 #endif //__OBLIVIOUS_SORT_H__

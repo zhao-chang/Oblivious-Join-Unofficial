@@ -2,8 +2,8 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
-FileSimulator::FileSimulator(const std::string& url, const std::string& collection_name, const bool create) 
-        :url(url), collection_name(collection_name) {
+FileSimulator::FileSimulator(const std::string& url, const std::string& collection_name, const bool create, const uint32_t block_size)
+        :url(url), collection_name(collection_name), block_size(block_size) {
     if (create) {
         FILE* fp = fopen(collection_name.c_str(), "wb");
         if (fp == NULL) {
@@ -21,7 +21,7 @@ FileSimulator::FileSimulator(const std::string& url, const std::string& collecti
         }
         //TODO: fseek_64 for Windows Platform
         fseek(fp, 0, SEEK_END);
-        block_num = (uint64_t)ftell(fp) / (uint64_t)B;
+        block_num = (uint64_t)ftell(fp) / (uint64_t)block_size;
         fclose(fp);
     }
 }
@@ -34,8 +34,13 @@ std::string FileSimulator::getCollectionName() {
     return collection_name;
 }
 
+// remove file
+void FileSimulator::finalize() {
+    remove(collection_name.c_str());
+}
+
 // remove and create new file
-void FileSimulator::clear(const std::string& ns) {
+void FileSimulator::clear() {
     remove(collection_name.c_str());
 
     FILE* fp = fopen(collection_name.c_str(), "wb");
@@ -46,14 +51,14 @@ void FileSimulator::clear(const std::string& ns) {
     fclose(fp);
 }
 
-void FileSimulator::resize(const uint32_t& len, const std::string& ns) {
+void FileSimulator::resize(const uint32_t& len) {
     fs::path fp = collection_name.c_str();
-    uint64_t file_size = (uint64_t)len * (uint64_t)B;
+    uint64_t file_size = (uint64_t)len * (uint64_t)block_size;
     fs::resize_file(fp, file_size);
 }
 
-std::string FileSimulator::find(const uint32_t& id, const std::string& ns) {
-    char block[B];
+std::string FileSimulator::find(const uint32_t& id) {
+    char block[block_size];
     FILE* fp = fopen(collection_name.c_str(), "rb");
     if (fp == NULL) {
         printf("Error: file cannot be opened successfully!");
@@ -61,28 +66,28 @@ std::string FileSimulator::find(const uint32_t& id, const std::string& ns) {
     }
     if (id != 0) {
         //TODO: fseek_64 for Windows Platform
-        uint64_t filePos = (uint64_t)id * (uint64_t)B;
+        uint64_t filePos = (uint64_t)id * (uint64_t)block_size;
         fseek(fp, filePos, SEEK_SET);
     }
-    fread(block, 1, B, fp);
+    fread(block, 1, block_size, fp);
     fclose(fp);
-    return std::string(block, B);
+    return std::string(block, block_size);
 }
 
-std::string FileSimulator::find(const std::string& id, const std::string& ns) {
+std::string FileSimulator::find(const std::string& id) {
     uint32_t block_id = atoi(id.c_str());
-    return find(block_id, ns);
+    return find(block_id);
 }
 
-void FileSimulator::find(const std::vector<uint32_t>& ids, std::string* sbuffer, size_t& length, const std::string& ns) {
+void FileSimulator::find(const std::vector<uint32_t>& ids, std::string* sbuffer, size_t& length) {
     length = ids.size();
     for (uint32_t i = 0; i < length; ++i) {
-        sbuffer[i] = find(ids[i], ns);
+        sbuffer[i] = find(ids[i]);
     }
 }
 
-void FileSimulator::find(const uint32_t& low, const uint32_t& high, std::vector<std::string>& blocks, const std::string& ns) {
-    char block[B];
+void FileSimulator::find(const uint32_t& low, const uint32_t& high, std::vector<std::string>& blocks) {
+    char block[block_size];
     FILE* fp = fopen(collection_name.c_str(), "rb");
     if (fp == NULL) {
         printf("Error: file cannot be opened successfully!");
@@ -92,20 +97,20 @@ void FileSimulator::find(const uint32_t& low, const uint32_t& high, std::vector<
     assert(high >= low);
     if (low != 0) {
         //TODO: fseek_64 for Windows Platform
-        uint64_t filePos = (uint64_t)low * (uint64_t)B;
+        uint64_t filePos = (uint64_t)low * (uint64_t)block_size;
         fseek(fp, filePos, SEEK_SET);
     }
 
     uint32_t block_cnt = high - low + 1;
     for (uint32_t i = 0; i < block_cnt; ++i) {
-        fread(block, 1, B, fp);
-        blocks.push_back(std::string(block, B));
+        fread(block, 1, block_size, fp);
+        blocks.push_back(std::string(block, block_size));
     }
     fclose(fp);
 }
 
-void FileSimulator::find(const uint32_t& low, const uint32_t& high, char* blocks, const std::string& ns) {
-    char block[B];
+void FileSimulator::find(const uint32_t& low, const uint32_t& high, char* blocks) {
+    char block[block_size];
     FILE* fp = fopen(collection_name.c_str(), "rb");
     if (fp == NULL) {
         printf("Error: file cannot be opened successfully!");
@@ -115,36 +120,36 @@ void FileSimulator::find(const uint32_t& low, const uint32_t& high, char* blocks
     assert(high >= low);
     if (low != 0) {
         //TODO: fseek_64 for Windows Platform
-        uint64_t filePos = (uint64_t)low * (uint64_t)B;
+        uint64_t filePos = (uint64_t)low * (uint64_t)block_size;
         fseek(fp, filePos, SEEK_SET);
     }
 
     uint32_t block_cnt = high - low + 1;
     char* pblock = blocks;
     for (uint32_t i = 0; i < block_cnt; ++i) {
-        fread(block, 1, B, fp);
-        memcpy(pblock, block, B);
-        pblock += B;
+        fread(block, 1, block_size, fp);
+        memcpy(pblock, block, block_size);
+        pblock += block_size;
     }
     fclose(fp);
 }
 
-std::string FileSimulator::fetch(const uint32_t& id, const std::string& ns) {
+std::string FileSimulator::fetch(const uint32_t& id) {
     //TODO:
-    return find(id, ns);
+    return find(id);
 }
 
-std::string FileSimulator::fetch(const std::string& id, const std::string& ns) {
+std::string FileSimulator::fetch(const std::string& id) {
     //TODO:
-    return find(id, ns);
+    return find(id);
 }
 
-void FileSimulator::fetch(const uint32_t& low, const uint32_t& high, char* blocks, const std::string& ns) {
+void FileSimulator::fetch(const uint32_t& low, const uint32_t& high, char* blocks) {
     //TODO:
-    find(low, high, blocks, ns);
+    find(low, high, blocks);
 }
 
-void FileSimulator::update(const uint32_t& id, const std::string& data, const std::string& ns) {
+void FileSimulator::update(const uint32_t& id, const std::string& data) {
     FILE* fp = fopen(collection_name.c_str(), "rb+");
     if (fp == NULL) {
         printf("Error: file cannot be opened successfully!");
@@ -152,19 +157,19 @@ void FileSimulator::update(const uint32_t& id, const std::string& data, const st
     }
     if (id != 0) {
         //TODO: fseek_64 for Windows Platform
-        uint64_t filePos = (uint64_t)id * (uint64_t)B;
+        uint64_t filePos = (uint64_t)id * (uint64_t)block_size;
         fseek(fp, filePos, SEEK_SET);
     }
-    fwrite(data.c_str(), 1, B, fp);
+    fwrite(data.c_str(), 1, block_size, fp);
     fclose(fp);
 }
 
-void FileSimulator::update(const std::string& id, const std::string& data, const std::string& ns) {
+void FileSimulator::update(const std::string& id, const std::string& data) {
     uint32_t block_id = atoi(id.c_str());
-    update(block_id, data, ns);
+    update(block_id, data);
 }
 
-void FileSimulator::update(const std::string* sbuffer, const uint32_t& low, const size_t& len, const std::string& ns) {
+void FileSimulator::update(const std::string* sbuffer, const uint32_t& low, const size_t& len) {
     FILE* fp = fopen(collection_name.c_str(), "rb+");
     if (fp == NULL) {
         printf("Error: file cannot be opened successfully!");
@@ -173,17 +178,17 @@ void FileSimulator::update(const std::string* sbuffer, const uint32_t& low, cons
 
     if (low != 0) {
         //TODO: fseek_64 for Windows Platform
-        uint64_t filePos = (uint64_t)low * (uint64_t)B;
+        uint64_t filePos = (uint64_t)low * (uint64_t)block_size;
         fseek(fp, filePos, SEEK_SET);
     }
 
     for (uint32_t i = 0; i < len; ++i) {
-        fwrite(sbuffer[i].c_str(), 1, B, fp);
+        fwrite(sbuffer[i].c_str(), 1, block_size, fp);
     }
     fclose(fp);
 }
 
-void FileSimulator::update(const std::vector<std::string>& blocks, const uint32_t& low, const uint32_t& high, const std::string& ns) {
+void FileSimulator::update(const std::vector<std::string>& blocks, const uint32_t& low, const uint32_t& high) {
     FILE* fp = fopen(collection_name.c_str(), "rb+");
     if (fp == NULL) {
         printf("Error: file cannot be opened successfully!");
@@ -193,18 +198,18 @@ void FileSimulator::update(const std::vector<std::string>& blocks, const uint32_
     assert(high >= low);
     if (low != 0) {
         //TODO: fseek_64 for Windows Platform
-        uint64_t filePos = (uint64_t)low * (uint64_t)B;
+        uint64_t filePos = (uint64_t)low * (uint64_t)block_size;
         fseek(fp, filePos, SEEK_SET);
     }
 
     uint32_t block_cnt = high - low + 1;
     for (uint32_t i = 0; i < block_cnt; ++i) {
-        fwrite(blocks[i].c_str(), 1, B, fp);
+        fwrite(blocks[i].c_str(), 1, block_size, fp);
     }
     fclose(fp);
 }
 
-void FileSimulator::update(const char* blocks, const uint32_t& low, const uint32_t& high, const std::string& ns) {
+void FileSimulator::update(const char* blocks, const uint32_t& low, const uint32_t& high) {
     FILE* fp = fopen(collection_name.c_str(), "rb+");
     if (fp == NULL) {
         printf("Error: file cannot be opened successfully!");
@@ -214,30 +219,30 @@ void FileSimulator::update(const char* blocks, const uint32_t& low, const uint32
     assert(high >= low);
     if (low != 0) {
         //TODO: fseek_64 for Windows Platform
-        uint64_t filePos = (uint64_t)low * (uint64_t)B;
+        uint64_t filePos = (uint64_t)low * (uint64_t)block_size;
         fseek(fp, filePos, SEEK_SET);
     }
 
     uint32_t block_cnt = high - low + 1;
     const char* pblock = blocks;
     for (uint32_t i = 0; i < block_cnt; ++i) {
-        fwrite(pblock, 1, B, fp);
-        pblock += B;
+        fwrite(pblock, 1, block_size, fp);
+        pblock += block_size;
     }
     fclose(fp);
 }
 
-void FileSimulator::update(const std::vector< std::pair<uint32_t, std::string> > blocks, const std::string& ns) {
+void FileSimulator::update(const std::vector< std::pair<uint32_t, std::string> > blocks) {
     for (uint32_t i = 0; i < blocks.size(); ++i) {
-        update(blocks[i].first, blocks[i].second, ns);
+        update(blocks[i].first, blocks[i].second);
     }
 }
 
-void FileSimulator::insert(const uint32_t& id, const std::string& encrypted_block, const std::string& ns) {
+void FileSimulator::insert(const uint32_t& id, const std::string& encrypted_block) {
     if (id < block_num)
-        update(id, encrypted_block, ns);
+        update(id, encrypted_block);
     else {
-        char block[B];
+        char block[block_size];
         FILE* fp = fopen(collection_name.c_str(), "ab");
         if (fp == NULL) {
             printf("Error: file cannot be opened successfully!");
@@ -245,25 +250,25 @@ void FileSimulator::insert(const uint32_t& id, const std::string& encrypted_bloc
         }
         uint32_t append_num = id - block_num;
         for (uint32_t i = 0; i < append_num; ++i)
-            fwrite(block, 1, B, fp);
-        fwrite(encrypted_block.c_str(), 1, B, fp);
+            fwrite(block, 1, block_size, fp);
+        fwrite(encrypted_block.c_str(), 1, block_size, fp);
         fclose(fp);
         block_num = id + 1;
     }
 }
 
-void FileSimulator::insert(const std::vector< std::pair<uint32_t, std::string> >& blocks, const std::string& ns) {
+void FileSimulator::insert(const std::vector< std::pair<uint32_t, std::string> >& blocks) {
     for (uint32_t i = 0; i < blocks.size(); ++i) {
-        insert(blocks[i].first, blocks[i].second, ns);
+        insert(blocks[i].first, blocks[i].second);
     }
 }
 
-void FileSimulator::insert(const std::string* sbuffer, const uint32_t& low, const size_t& len, const std::string& ns) {
+void FileSimulator::insert(const std::string* sbuffer, const uint32_t& low, const size_t& len) {
     if (low + len <= block_num) {
-        update(sbuffer, low, len, ns);
+        update(sbuffer, low, len);
     }
     else if (low >= block_num) {
-        char block[B];
+        char block[block_size];
         FILE* fp = fopen(collection_name.c_str(), "ab");
         if (fp == NULL) {
             printf("Error: file cannot be opened successfully!");
@@ -271,15 +276,15 @@ void FileSimulator::insert(const std::string* sbuffer, const uint32_t& low, cons
         }
         uint32_t append_num = low - block_num;
         for (uint32_t i = 0; i < append_num; ++i)
-            fwrite(block, 1, B, fp);
+            fwrite(block, 1, block_size, fp);
         for (uint32_t i = 0; i < len; ++i)
-            fwrite(sbuffer[i].c_str(), 1, B, fp);
+            fwrite(sbuffer[i].c_str(), 1, block_size, fp);
         fclose(fp);
         block_num = low + len;
     }
     else {
         uint32_t update_len = block_num - low;
-        update(sbuffer, low, update_len, ns);
+        update(sbuffer, low, update_len);
 
         FILE* fp = fopen(collection_name.c_str(), "ab");
         if (fp == NULL) {
@@ -287,18 +292,18 @@ void FileSimulator::insert(const std::string* sbuffer, const uint32_t& low, cons
             return;
         }
         for (uint32_t i = update_len; i < len; ++i)
-            fwrite(sbuffer[i].c_str(), 1, B, fp);
+            fwrite(sbuffer[i].c_str(), 1, block_size, fp);
         fclose(fp);
         block_num = low + len;
     }
 }
 
-void FileSimulator::insert(const std::vector<std::string>& blocks, const uint32_t& low, const uint32_t& high, const std::string& ns) {
+void FileSimulator::insert(const std::vector<std::string>& blocks, const uint32_t& low, const uint32_t& high) {
     if (high < block_num) {
-        update(blocks, low, high, ns);
+        update(blocks, low, high);
     }
     else if (low >= block_num) {
-        char block[B];
+        char block[block_size];
         FILE* fp = fopen(collection_name.c_str(), "ab");
         if (fp == NULL) {
             printf("Error: file cannot be opened successfully!");
@@ -306,16 +311,16 @@ void FileSimulator::insert(const std::vector<std::string>& blocks, const uint32_
         }
         uint32_t append_num = low - block_num;
         for (uint32_t i = 0; i < append_num; ++i)
-            fwrite(block, 1, B, fp);
+            fwrite(block, 1, block_size, fp); 
         uint32_t block_cnt = high - low + 1;
         for (uint32_t i = 0; i < block_cnt; ++i)
-            fwrite(blocks[i].c_str(), 1, B, fp);
+            fwrite(blocks[i].c_str(), 1, block_size, fp);
         fclose(fp);
         block_num = high + 1;
     }
     else {
-        update(blocks, low, block_num - 1, ns);
-
+        update(blocks, low, block_num - 1);
+        
         FILE* fp = fopen(collection_name.c_str(), "ab");
         if (fp == NULL) {
             printf("Error: file cannot be opened successfully!");
@@ -324,18 +329,18 @@ void FileSimulator::insert(const std::vector<std::string>& blocks, const uint32_
         uint32_t update_len = block_num - low;
         uint32_t block_cnt = high - low + 1;
         for (uint32_t i = update_len; i < block_cnt; ++i)
-            fwrite(blocks[i].c_str(), 1, B, fp);
+            fwrite(blocks[i].c_str(), 1, block_size, fp);
         fclose(fp);
         block_num = high + 1;
     }
 }
 
-void FileSimulator::insert(const char* blocks, const uint32_t& low, const uint32_t& high, const std::string& ns) {
+void FileSimulator::insert(const char* blocks, const uint32_t& low, const uint32_t& high) {
     if (high < block_num) {
-        update(blocks, low, high, ns);
+        update(blocks, low, high);
     }
     else if (low >= block_num) {
-        char block[B];
+        char block[block_size];
         FILE* fp = fopen(collection_name.c_str(), "ab");
         if (fp == NULL) {
             printf("Error: file cannot be opened successfully!");
@@ -343,18 +348,18 @@ void FileSimulator::insert(const char* blocks, const uint32_t& low, const uint32
         }
         uint32_t append_num = low - block_num;
         for (uint32_t i = 0; i < append_num; ++i)
-            fwrite(block, 1, B, fp);
+            fwrite(block, 1, block_size, fp);
         uint32_t block_cnt = high - low + 1;
         const char* pblock = blocks;
         for (uint32_t i = 0; i < block_cnt; ++i) {
-            fwrite(pblock, 1, B, fp);
-            pblock += B;
+            fwrite(pblock, 1, block_size, fp);
+            pblock += block_size;
         }
         fclose(fp);
         block_num = high + 1;
     }
     else {
-        update(blocks, low, block_num - 1, ns);
+        update(blocks, low, block_num - 1);
 
         FILE* fp = fopen(collection_name.c_str(), "ab");
         if (fp == NULL) {
@@ -363,35 +368,35 @@ void FileSimulator::insert(const char* blocks, const uint32_t& low, const uint32
         }
         uint32_t update_len = block_num - low;
         uint32_t block_cnt = high - low + 1;
-        const char* pblock = blocks + update_len * B;
+        const char* pblock = blocks + update_len * block_size;
         for (uint32_t i = update_len; i < block_cnt; ++i) {
-            fwrite(pblock, 1, B, fp);
-            pblock += B;
+            fwrite(pblock, 1, block_size, fp);
+            pblock += block_size;
         }
         fclose(fp);
         block_num = high + 1;
     }
 }
 
-void FileSimulator::insert(const std::vector< std::pair<std::string, std::string> >& blocks, const std::string& ns) {
+void FileSimulator::insert(const std::vector< std::pair<std::string, std::string> >& blocks) {
     for (uint32_t i = 0; i < blocks.size(); ++i) {
         uint32_t block_id = atoi(blocks[i].first.c_str());
-        insert(block_id, blocks[i].second, ns);
+        insert(block_id, blocks[i].second);
     }
 }
 
-void FileSimulator::remove(const uint32_t& id, const std::string& ns) {
+void FileSimulator::remove(const uint32_t& id) {
     //TODO:
-    find(id, ns);
+    find(id);
 }
 
-void FileSimulator::remove(const std::string& id, const std::string& ns) {
+void FileSimulator::remove(const std::string& id) {
     //TODO:
-    find(id, ns);
+    find(id);
 }
 
-void FileSimulator::remove(const uint32_t& low, const uint32_t& high, const std::string& ns) {
+void FileSimulator::remove(const uint32_t& low, const uint32_t& high) {
     //TODO:
     std::vector<std::string> blocks;
-    find(low, high, blocks, ns);
+    find(low, high, blocks);
 }

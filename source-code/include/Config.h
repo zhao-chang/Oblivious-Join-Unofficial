@@ -14,6 +14,7 @@ const std::string server_host = "localhost";
 
 /* Path ORAM */
 const uint32_t PathORAM_Z = 4;
+const uint32_t ObliviousHeap_Z = 4;
 const double btree_node_rate = 1.0;
 
 /* Cache Reserved Factor */

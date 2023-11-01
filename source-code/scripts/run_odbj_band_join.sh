@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ $# -ne 4 ]; then
-    echo "Usage: ./run_obli_database_band_join server_name mode scale query_file"
+if [ $# -ne 5 ]; then
+    echo "Usage: ./run_odbj_band_join server_name sort_type mode scale query_file"
     exit -1
 fi
 
@@ -9,4 +9,4 @@ make
 
 echo "===================================================================================================="
 
-./obli_database_join $2 $3 $4
+./odbj_band_join $2 $3 $4 $5

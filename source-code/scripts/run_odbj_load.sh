@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -ne 2 ]; then
-    echo "Usage: ./run_obli_database_load mode scale"
+    echo "Usage: ./run_odbj_load mode scale"
     exit -1
 fi
 
@@ -9,6 +9,6 @@ make
 
 echo "===================================================================================================="
 
-./obli_database_load $1 $2
+./odbj_load $1 $2
 
 echo "===================================================================================================="

@@ -6,7 +6,7 @@
 
 int main(int argc, char* argv[]) {
     if (argc != 3) {
-        printf("Usage: ./obli_database_load <mode> <scale> \n");
+        printf("Usage: ./odbj_load <mode> <scale> \n");
         return -1;
     }
     

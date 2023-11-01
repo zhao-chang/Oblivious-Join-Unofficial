@@ -5,19 +5,20 @@
 #include "ObliDatabaseJoin.h"
 
 int main(int argc, char* argv[]) {
-    if (argc != 4) {
-        printf("Usage: ./obli_database_equi_join <mode> <scale> <query_file>\n");
+    if (argc != 5) {
+        printf("Usage: ./odbj_band_join <sort_type> <mode> <scale> <query_file>\n");
         return -1;
     }
     
-    const uint32_t mode = atoi(argv[1]);
+    std::string sort_type = std::string(argv[1]);
+    const uint32_t mode = atoi(argv[2]);
     const std::string method = "odbj";
-    std::string scale = std::string(argv[2]);
+    std::string scale = std::string(argv[3]);
     std::string prefix = getCollectionPrefix(mode, method, scale);
     std::string meta_prefix = "metas/" + prefix;
     ObliDatabaseJoin* odbj = new ObliDatabaseJoin(mode, meta_prefix);
     
-    FILE* fp = fopen(argv[3], "r");
+    FILE* fp = fopen(argv[4], "r");
     uint32_t n_tables;
     fscanf(fp, "%d", &n_tables);
     uint32_t table_id[n_tables];
@@ -33,6 +34,10 @@ int main(int argc, char* argv[]) {
     for (uint32_t i = 0; i < n_tables; ++i)
         fscanf(fp, "%d", parent_attr_id + i);
     
+    double band_range[2];
+    for (uint32_t i = 0; i < 2; ++i)
+        fscanf(fp, "%lf", band_range + i);
+    
     uint32_t n_proj_cols;
     fscanf(fp, "%d", &n_proj_cols);
     uint32_t proj_id[2][MAX_COLS];
@@ -41,7 +46,7 @@ int main(int argc, char* argv[]) {
     fclose(fp);
     
     auto start = std::chrono::high_resolution_clock::now();
-    odbj->ObliEquiJoin(n_tables, table_id, parent_id, attr_id, parent_attr_id, n_proj_cols, proj_id);
+    odbj->ObliBandJoin(sort_type, n_tables, table_id, parent_id, attr_id, parent_attr_id, band_range, n_proj_cols, proj_id);
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> diff = end - start;
     auto time = diff.count();

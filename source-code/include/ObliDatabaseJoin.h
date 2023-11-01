@@ -134,8 +134,9 @@ public:
         }
     }
     
-    void ObliEquiJoin(const uint32_t n_tables, const uint32_t* table_id, const int32_t* parent_id, const int32_t* attr_id, const int32_t* parent_attr_id, const uint32_t n_proj_cols, const uint32_t proj_id[][MAX_COLS]) {
+    void ObliEquiJoin(const std::string sort_type, const uint32_t n_tables, const uint32_t* table_id, const int32_t* parent_id, const int32_t* attr_id, const int32_t* parent_attr_id, const uint32_t n_proj_cols, const uint32_t proj_id[][MAX_COLS]) {
         assert(n_tables == 2);
+        sortType = sort_type;
         nTables = n_tables;
         iTable = new uint32_t[nTables];
         attrID = new int32_t[nTables];
@@ -271,8 +272,9 @@ public:
         }
     }
     
-    void ObliBandJoin(const uint32_t n_tables, const uint32_t* table_id, const int32_t* parent_id, const int32_t* attr_id, const int32_t* parent_attr_id, const double* band_range, const uint32_t n_proj_cols, const uint32_t proj_id[][MAX_COLS]) {
+    void ObliBandJoin(const std::string sort_type, const uint32_t n_tables, const uint32_t* table_id, const int32_t* parent_id, const int32_t* attr_id, const int32_t* parent_attr_id, const double* band_range, const uint32_t n_proj_cols, const uint32_t proj_id[][MAX_COLS]) {
         assert(n_tables == 2);
+        sortType = sort_type;
         nTables = n_tables;
         iTable = new uint32_t[nTables];
         attrID = new int32_t[nTables];
@@ -435,8 +437,7 @@ public:
     }
     
     size_t getCommSize() const {
-        size_t total_comm_size = comm_size * (size_t)B;
-        return total_comm_size;
+        return comm_size;
     }
     
     void resetCommSize() {
@@ -453,7 +454,9 @@ private:
             uint32_t tableID = iTable[index];
             CMP in_cmp {1, {attrID[index]}, {0}};
             ObliviousSort* oblisort = new ObliviousSort(in_conn[tableID], nBlocks[tableID], &(in_sch[tableID]), &in_cmp);
-            comm_size += oblisort->BatcherSort();
+            if (sortType == "batcher") comm_size += oblisort->BatcherSort();
+            else if (sortType == "heap") comm_size += oblisort->HeapSort();
+            else comm_size += oblisort->BatcherSort();
             delete oblisort;
             
             // unify input tables
@@ -666,15 +669,17 @@ private:
         /***********************/
         for (uint32_t index = 0; index < nTables; ++index) {
             uint32_t tableID = iTable[index];
-            comm_size += nBlocks[tableID];
+            comm_size += (size_t)nBlocks[tableID] * (size_t)B;
         }
-        comm_size += union_n_blocks;
+        comm_size += (size_t)union_n_blocks * (size_t)B;
         /***********************/
         
         // obliviously sort the unified table
         CMP union_cmp {3, {attrID[0], nAttrs[2] - 2, nAttrs[2] - 3}, {0, 0, 0}};
         ObliviousSort* oblisort = new ObliviousSort(union_conn, union_n_blocks, union_sch, &union_cmp);
-        comm_size += oblisort->BatcherSort();
+        if (sortType == "batcher") comm_size += oblisort->BatcherSort();
+        else if (sortType == "heap") comm_size += oblisort->HeapSort();
+        else comm_size += oblisort->BatcherSort();
         delete oblisort;
     }
     
@@ -730,13 +735,15 @@ private:
             iLeft = iRight;
         }
         /***********************/
-        comm_size += 2 * union_n_blocks;
+        comm_size += (size_t)(2 * union_n_blocks) * (size_t)B;
         /***********************/
         
         // obliviously sort the unified table
         CMP union_cmp {2, {nAttrs - 2, nAttrs - 3}, {0, 0}};
         ObliviousSort* oblisort = new ObliviousSort(union_conn, union_n_blocks, union_sch, &union_cmp);
-        comm_size += oblisort->BatcherSort();
+        if (sortType == "batcher") comm_size += oblisort->BatcherSort();
+        else if (sortType == "heap") comm_size += oblisort->HeapSort();
+        else comm_size += oblisort->BatcherSort();
         delete oblisort;
     }
     
@@ -880,7 +887,7 @@ private:
         }
         
         /***********************/
-        comm_size += union_block_id + 1 + 2 * separate_n_blocks;
+        comm_size += (size_t)(union_block_id + 1 + 2 * separate_n_blocks) * (size_t)B;
         /***********************/
     }
     
@@ -1008,7 +1015,7 @@ private:
         weight_n_blocks[weight_index] = oBlockID;
         
         /***********************/
-        comm_size += 2 * separate_n_blocks + weight_n_blocks[weight_index];
+        comm_size += (size_t)(2 * separate_n_blocks + weight_n_blocks[weight_index]) + (size_t)B;
         /***********************/
     }
     
@@ -1025,14 +1032,17 @@ private:
         uint32_t nAttrs = fval_sch->nAttrs;
         CMP fval_cmp {1, {nAttrs - 1}, {0}};
         ObliviousSort* oblisort = new ObliviousSort(fval_conn, fval_n_blocks, fval_sch, &fval_cmp);
-        comm_size += oblisort->BatcherSort();
+        if (sortType == "batcher") comm_size += oblisort->BatcherSort();
+        else if (sortType == "heap") comm_size += oblisort->HeapSort();
+        else comm_size += oblisort->BatcherSort();
         delete oblisort;
         
         // if (result size < input size), then resize the input file with f values
         uint32_t est_real_block_num = (uint32_t)ceil((double)est_real_item_num / fval_sch->item_per_blk);
         if (est_real_block_num < fval_n_blocks) {
             resizeFile(fval_conn, est_real_block_num);
-            comm_size += 2 * est_real_block_num;
+            comm_size += (size_t)(2 * est_real_block_num) * (size_t)B;
+            fval_n_blocks = est_real_block_num;
         }
         
         //obliviously distribute the items
@@ -1157,7 +1167,7 @@ private:
         fval_n_blocks = oBlockID;
         
         /***********************/
-        comm_size += weight_n_blocks[weight_index] + fval_n_blocks;
+        comm_size += (size_t)(weight_n_blocks[weight_index] + fval_n_blocks) * (size_t)B;
         /***********************/
     }
     
@@ -1265,7 +1275,7 @@ private:
         }
         expand_n_blocks[expand_index] = oBlockID;
         /***********************/
-        comm_size += fval_n_blocks + expand_n_blocks[expand_index];
+        comm_size += (size_t)(fval_n_blocks + expand_n_blocks[expand_index]) * (size_t)B;
         /***********************/
     }
     
@@ -1291,7 +1301,9 @@ private:
         // obliviously sort the expanded input table based on position and item_id
         CMP expand_cmp {2, {nAttrs[1] - 1, nAttrs[1] - 2}, {0, 0}};
         ObliviousSort* oblisort = new ObliviousSort(expand_conn[1], expand_n_blocks[1], &(expand_sch[1]), &expand_cmp);
-        comm_size += oblisort->BatcherSort();
+        if (sortType == "batcher") comm_size += oblisort->BatcherSort();
+        else if (sortType == "heap") comm_size += oblisort->HeapSort();
+        else comm_size += oblisort->BatcherSort();
         delete oblisort;
         
         char* iBlock[2];
@@ -1347,8 +1359,8 @@ private:
         
         /***********************/
         for (uint32_t j = 0; j < 2; ++j)
-            comm_size += expand_n_blocks[j];
-        comm_size += out_tot_block;
+            comm_size += (size_t)expand_n_blocks[j] * (size_t)B;
+        comm_size += (size_t)out_tot_block * (size_t)B;
         /***********************/
     }
     
@@ -1516,15 +1528,17 @@ private:
         /***********************/
         for (uint32_t index = 0; index < nTables; ++index) {
             uint32_t tableID = iTable[index];
-            comm_size += nBlocks[tableID];
+            comm_size += (size_t)nBlocks[tableID] * (size_t)B;
         }
-        comm_size += union_n_blocks;
+        comm_size += (size_t)union_n_blocks * (size_t)B;
         /***********************/
         
         // obliviously sort the unified table
         CMP union_cmp {2, {attrID[0], nAttrs[2] - append_num}, {0, 0}};
         ObliviousSort* oblisort = new ObliviousSort(union_conn, union_n_blocks, union_sch, &union_cmp);
-        comm_size += oblisort->BatcherSort();
+        if (sortType == "batcher") comm_size += oblisort->BatcherSort();
+        else if (sortType == "heap") comm_size += oblisort->HeapSort();
+        else comm_size += oblisort->BatcherSort();
         delete oblisort;
     }
     
@@ -1693,7 +1707,7 @@ private:
         if (scan_order == 1) {
             printf("\nThe number of estimated real items in result table: %u\n\n", est_real_item_num);
         }
-        comm_size += 2 * union_n_blocks;
+        comm_size += (size_t)(2 * union_n_blocks) * (size_t)B;
         /***********************/
     }
     
@@ -1701,7 +1715,9 @@ private:
         // obliviously sort the unified table with join degrees
         CMP union_cmp {2, {union_sch->nAttrs - 3, attrID[0]}, {0, 0}};
         ObliviousSort* oblisort = new ObliviousSort(union_conn, union_n_blocks, union_sch, &union_cmp);
-        comm_size += oblisort->BatcherSort();
+        if (sortType == "batcher") comm_size += oblisort->BatcherSort();
+        else if (sortType == "heap") comm_size += oblisort->HeapSort();
+        else comm_size += oblisort->BatcherSort();
         delete oblisort;
         
         // initialize the schema of input tables with join degrees
@@ -1871,9 +1887,9 @@ private:
         weight_n_blocks[weight_index] = oBlockID;
         
         /***********************/
-        comm_size += union_n_blocks;
+        comm_size += (size_t)union_n_blocks * (size_t)B;
         for (uint32_t index = 0; index < nTables; ++index)
-            comm_size += weight_n_blocks[index];
+            comm_size += (size_t)weight_n_blocks[index] * (size_t)B;
         /***********************/
     }
     
@@ -1890,14 +1906,17 @@ private:
         uint32_t nAttrs = fval_sch->nAttrs;
         CMP fval_cmp {1, {nAttrs - 1}, {0}};
         ObliviousSort* oblisort = new ObliviousSort(fval_conn, fval_n_blocks, fval_sch, &fval_cmp);
-        comm_size += oblisort->BatcherSort();
+        if (sortType == "batcher") comm_size += oblisort->BatcherSort();
+        else if (sortType == "heap") comm_size += oblisort->HeapSort();
+        else comm_size += oblisort->BatcherSort();
         delete oblisort;
         
         // if (result size < input size), then resize the input file with f values
         uint32_t est_real_block_num = (uint32_t)ceil((double)est_real_item_num / fval_sch->item_per_blk);
         if (est_real_block_num < fval_n_blocks) {
             resizeFile(fval_conn, est_real_block_num);
-            comm_size += 2 * est_real_block_num;
+            comm_size += (size_t)(2 * est_real_block_num) * (size_t)B;
+            fval_n_blocks = est_real_block_num;
         }
         
         //obliviously distribute the items
@@ -2022,7 +2041,7 @@ private:
         fval_n_blocks = oBlockID;
         
         /***********************/
-        comm_size += weight_n_blocks[weight_index] + fval_n_blocks;
+        comm_size += (size_t)(weight_n_blocks[weight_index] + fval_n_blocks) * (size_t)B;
         /***********************/
     }
     
@@ -2048,14 +2067,14 @@ private:
             char* dst_block = buffer + B;
             readBlock(fval_conn, src_block_id, src_block);
             /***********************/
-            ++comm_size;
+            comm_size += (size_t)B;
             /***********************/
             if (src_block_id == dst_block_id)
                 memcpy(dst_block, src_block, B);
             else {
                 readBlock(fval_conn, dst_block_id, dst_block);
                 /***********************/
-                ++comm_size;
+                comm_size += (size_t)B;
                 /***********************/
             }
             while (src_tot_item_id >= 0) {
@@ -2081,7 +2100,7 @@ private:
                     if (src_block_id != dst_block_id) {
                         updateBlock(fval_conn, src_block_id, src_block);
                         /***********************/
-                        ++comm_size;
+                        comm_size += (size_t)B;
                         /***********************/
                     }
                     --src_block_id;
@@ -2089,13 +2108,13 @@ private:
                     if (src_block_id >= 0) {
                         readBlock(fval_conn, src_block_id, src_block);
                         /***********************/
-                        ++comm_size;
+                        comm_size += (size_t)B;
                         /***********************/
                     }
                     else {
                         updateBlock(fval_conn, dst_block_id, dst_block);
                         /***********************/
-                        ++comm_size;
+                        comm_size += (size_t)B;
                         /***********************/
                         break;
                     }
@@ -2104,7 +2123,7 @@ private:
                 else {
                     updateBlock(fval_conn, dst_block_id, dst_block);
                     /***********************/
-                    ++comm_size;
+                    comm_size += (size_t)B;
                     /***********************/
                     --dst_block_id;
                     dst_item_id = fval_sch->item_per_blk - 1;
@@ -2114,7 +2133,7 @@ private:
                     else {
                         readBlock(fval_conn, dst_block_id, dst_block);
                         /***********************/
-                        ++comm_size;
+                        comm_size += (size_t)B;
                         /***********************/
                     }
                 }
@@ -2212,7 +2231,7 @@ private:
         }
         expand_n_blocks[expand_index] = fval_n_blocks;
         /***********************/
-        comm_size += fval_n_blocks + expand_n_blocks[expand_index];
+        comm_size += (size_t)(fval_n_blocks + expand_n_blocks[expand_index]) * (size_t)B;
         /***********************/
     }
     
@@ -2329,7 +2348,9 @@ private:
         // obliviously sort the expanded input table based on join column and ii
         CMP expand_cmp {2, {attrID[1], nAttrs[1] - 1}, {0, 0}};
         ObliviousSort* oblisort = new ObliviousSort(expand_conn[1], expand_n_blocks[1], &(expand_sch[1]), &expand_cmp);
-        comm_size += oblisort->BatcherSort();
+        if (sortType == "batcher") comm_size += oblisort->BatcherSort();
+        else if (sortType == "heap") comm_size += oblisort->HeapSort();
+        else comm_size += oblisort->BatcherSort();
         delete oblisort;
         
         char* iBlock[2];
@@ -2351,14 +2372,14 @@ private:
         uint32_t oBlockID = 0;
         uint32_t oItemCnt = 0;
         uint32_t oRItemCnt = 0;
-        
+
         // stitch the expanded tables
         bool iEnd = false;
         while (!iEnd) {
             if (*iPItem[0] == 'r') {
                 assert(*iPItem[1] == 'r');
                 writeItem('r', iPItem, oBlock, oItem, oItemCnt, oRItemCnt, oBlockID);
-                
+
                 for (uint32_t j = 0; j < 2; ++j) {
                     if (iItemCnt[j] < itemPerBlk[j] - 1) {
                         iPItem[j] += itemSize[j];
@@ -2385,8 +2406,8 @@ private:
         
         /***********************/
         for (uint32_t j = 0; j < 2; ++j)
-            comm_size += expand_n_blocks[j];
-        comm_size += out_tot_block;
+            comm_size += (size_t)expand_n_blocks[j] * (size_t)B;
+        comm_size += (size_t)out_tot_block * (size_t)B;
         /***********************/
     }
     
@@ -2402,6 +2423,8 @@ private:
     // # of items in input tables
     uint32_t* iItemNum = NULL;
     
+    // type of oblivious sort
+    std::string sortType;
     // join query info
     uint32_t nTables;
     uint32_t* iTable = NULL;

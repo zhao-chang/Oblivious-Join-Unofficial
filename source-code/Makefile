@@ -3,13 +3,15 @@ CC=g++
 CXXFLAGS=-lstdc++fs -std=c++17 -O3 -W
 INCLUDES=-Iinclude
 LINKERS=-L/usr/local/lib -L/usr/lib -lstdc++fs -lcrypto -lssl
-WARNINGS=-Wno-unused-result -Wno-sign-compare -Wno-maybe-uninitialized -Wno-narrowing -Wno-return-type
+WARNINGS=-Wno-unused-result -Wno-sign-compare -Wno-maybe-uninitialized -Wno-narrowing -Wno-return-type -Wno-format
 
 SUPPORT_SRCFILES = src/Util.cpp \
-				   src/EncryptionEngine.cpp \
-				   src/FileSimulator.cpp \
-				   src/PathORAM.cpp \
-				   #src/MongoConnector.cpp
+                   src/EncryptionEngine.cpp \
+                   src/FileSimulator.cpp \
+                   src/PathORAM.cpp \
+                   src/ObliviousHeap.cpp \
+                   #TODO:
+                   #src/MongoConnector.cpp
 
 HEADER_ONLY_SOURCES = include/PrivIndexJoin.h \
                       include/ObliIndexJoin.h \
@@ -29,9 +31,9 @@ HEADER_ONLY_SOURCES = include/PrivIndexJoin.h \
 
 SUPPORT_OBJFILES = $(patsubst src/%.cpp, obj/%.o, $(SUPPORT_SRCFILES))
 
-EXECUTABLE = obli_database_load \
-             obli_database_equi_join \
-             obli_database_band_join \
+EXECUTABLE = odbj_load \
+             odbj_equi_join \
+             odbj_band_join \
              oij_type1_load \
              oij_type1_inlj_equi_join \
              oij_type1_smj_equi_join \
@@ -45,7 +47,7 @@ EXECUTABLE = obli_database_load \
              one_type1_inlj_band_join \
              one_type1_smj_band_join \
              one_type1_multi_load \
-             one_type1_multi_join
+             one_type1_multi_join \
 
 all: $(EXECUTABLE)
 
